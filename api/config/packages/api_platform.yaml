@@ -4,6 +4,7 @@ api_platform:
     # Mercure integration, remove if unwanted
     mercure: ~
     formats:
+        json: ['application/json']
         jsonld: ['application/ld+json']
     docs_formats:
         jsonld: ['application/ld+json']
@@ -11,6 +12,8 @@ api_platform:
         html: ['text/html']
     # Good defaults for REST APIs
     defaults:
+        pagination_items_per_page: 2
+
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
