@@ -2,15 +2,18 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AuthorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource]
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
+#[ApiFilter(DateFilter::class, properties: ['birthdate'])]
 class Author
 {
     #[ORM\Id]
@@ -19,6 +22,7 @@ class Author
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(max: 10)]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
@@ -29,6 +33,10 @@ class Author
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Book::class, orphanRemoval: true)]
     private Collection $books;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Email]
+    private ?string $email = null;
 
     public function __construct()
     {
@@ -102,6 +110,18 @@ class Author
                 $book->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
 
         return $this;
     }

@@ -10,9 +10,12 @@ api_platform:
         jsonld: ['application/ld+json']
         jsonopenapi: ['application/vnd.openapi+json']
         html: ['text/html']
+    collection:
+        pagination:
+            page_parameter_name: mypage
     # Good defaults for REST APIs
     defaults:
-        pagination_items_per_page: 2
+        pagination_items_per_page: 10
 
         stateless: true
         cache_headers:

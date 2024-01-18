@@ -9,6 +9,8 @@ use App\Repository\BookRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 
 #[ApiResource(
     // ON peut choisir quels champs seront sérialisés sur des GET
@@ -28,6 +30,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     // ]
 )]
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['title', 'author'])]
 class Book
 {
     #[ORM\Id]
