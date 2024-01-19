@@ -1,17 +1,40 @@
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        App\Entity\User: 'auto'
+
+    enable_authenticator_manager: true
+
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        # used to reload user from session & other features (e.g. switch_user)
+        users_in_database:
+            entity:
+                class: App\Entity\User
+                property: email
+
+        # Autre fournisseur de users, depuis la configuration
+        users_in_memory:
+            memory:
+                users:
+                    john_admin: { password: '$2y$13$jxGxc ... IuqDju', roles: ['ROLE_ADMIN'] }
+                    jane_admin: { password: '$2y$13$PFi1I ... rGwXCZ', roles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'] }
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+            
         main:
-            lazy: true
-            provider: users_in_memory
+            stateless: true
+            provider: users_in_database
+            json_login:
+                check_path: auth # The name in routes.yaml is enough for mapping
+                username_path: adressemail
+                password_path: motdepasse
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            jwt: ~
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -19,11 +42,18 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
+        # Si jamais on souhaitais sécuriser la section blog et ne l'autoriser que aux utilisateurs listés en conf
+        # blog:
+        #     pattern: ^/blog
+        #     security: true
+        #     provider: users_in_memory
+        
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI docs
+        - { path: ^/connexion, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
